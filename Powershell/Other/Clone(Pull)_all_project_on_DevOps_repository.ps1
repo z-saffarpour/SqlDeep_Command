@@ -1,16 +1,13 @@
-﻿param 
-(
-    [Parameter(Mandatory=$true)][string]$Auth,
-    [Parameter(Mandatory=$true)][string]$Organization,
-    [Parameter(Mandatory=$true)][string]$Project,
-    [Parameter(Mandatory=$true)][string]$LocalPath
-)
+﻿[Parameter(Mandatory=$true)][string]$Auth = "{myTokenName:Token}"
+[Parameter(Mandatory=$true)][string]$Organization = "tolle" # my Azure DevOps organization
+[Parameter(Mandatory=$true)][string]$Project = "" # my Azure DevOps Project
+[Parameter(Mandatory=$true)][string]$LocalPath = "C:\SqlDeep\Source"
 #--===============================================
 $myBytes = [System.Text.Encoding]::ASCII.GetBytes($Auth)
 $myToken = [System.Convert]::ToBase64String($myBytes) 
 $myHeader = @{ Authorization = "Basic $myToken" }
 
-$myURL = ("https://azure.okco.ir/$Organization/$Project/_apis/git/repositories").Replace(" ","%20")
+$myURL = ("https://dev.azure.com/$Organization/$Project/_apis/git/repositories").Replace(" ","%20")
 $myResponse = Invoke-WebRequest -Method GET -Uri $myURL -Headers $myHeader
 $myRepositories = $myResponse | ConvertFrom-Json | Select-Object -ExpandProperty value
 foreach($myRepo in $myRepositories)
