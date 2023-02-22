@@ -1,13 +1,17 @@
-﻿[Parameter(Mandatory=$true)][string]$Auth = "{myTokenName:Token}"
-[Parameter(Mandatory=$true)][string]$Organization = "tolle" # my Azure DevOps organization
+﻿#Guid to making Access token :  https://chuvash.eu/2022/02/21/automate-creation-of-git-repos-using-azure-devops-api/
+[Parameter(Mandatory=$true)][string]$TokenName = "TokenName"
+[Parameter(Mandatory=$true)][string]$Token = "Token"
+[Parameter(Mandatory=$true)][string]$DevOpsURL = "https://dev.azure.com" # my Azure DevOps URL
+[Parameter(Mandatory=$true)][string]$Organization = "" # my Azure DevOps organization
 [Parameter(Mandatory=$true)][string]$Project = "" # my Azure DevOps Project
 [Parameter(Mandatory=$true)][string]$LocalPath = "C:\SqlDeep\Source"
 #--===============================================
-$myBytes = [System.Text.Encoding]::ASCII.GetBytes($Auth)
+$myAuth = $TokenName + ":" + $Token
+$myBytes = [System.Text.Encoding]::ASCII.GetBytes($myAuth)
 $myToken = [System.Convert]::ToBase64String($myBytes) 
 $myHeader = @{ Authorization = "Basic $myToken" }
 
-$myURL = ("https://dev.azure.com/$Organization/$Project/_apis/git/repositories").Replace(" ","%20")
+$myURL = ("$DevOpsURL/$Organization/$Project/_apis/git/repositories").Replace(" ","%20")
 $myResponse = Invoke-WebRequest -Method GET -Uri $myURL -Headers $myHeader
 $myRepositories = $myResponse | ConvertFrom-Json | Select-Object -ExpandProperty value
 foreach($myRepo in $myRepositories)
